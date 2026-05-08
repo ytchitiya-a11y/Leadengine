@@ -1,1 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #060810;
+  --bg-surface: #0c0f1a;
+  --bg-elevated: #111527;
+  --border: #1e2438;
+  --accent: #4f74ff;
+  --text-primary: #e8ecf8;
+  --text-secondary: #8892b0;
+  --hot: #ff4d6a;
+  --warm: #f5a623;
+  --success: #34d399;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: #2a3250; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #3d4f8a; }
+
+/* Selection */
+::selection { background: rgba(79,116,255,0.3); color: white; }
+
+/* Noise texture overlay */
+.noise::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.3;
+}
+
+/* Shimmer skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #111527 25%, #1e2438 50%, #111527 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Glass card */
+.glass {
+  background: rgba(17, 21, 39, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 36, 56, 0.8);
+}
+
+/* Gradient border trick */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(79,116,255,0.4), transparent, rgba(167,139,250,0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Glow orb background */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* Animated number */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Score ring animation */
+@keyframes scoreRing {
+  from { stroke-dashoffset: 283; }
+  to { stroke-dashoffset: var(--target); }
+}
+.score-ring { animation: scoreRing 1.2s ease forwards; }
+
+/* Stagger children */
+.stagger > * {
+  animation: slideUp 0.4s ease both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid rgba(79,116,255,0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hot badge glow */
+.hot-glow { box-shadow: 0 0 12px rgba(255,77,106,0.35); }
+.accent-glow { box-shadow: 0 0 16px rgba(79,116,255,0.3); }
+.success-glow { box-shadow: 0 0 12px rgba(52,211,153,0.25); }
+
+/* Table row hover */
+.table-row-hover:hover { background: rgba(30,36,56,0.5); }
+
+/* Input styles */
+.input-base {
+  width: 100%;
+  background: rgba(17,21,39,0.8);
+  border: 1px solid #1e2438;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: #e8ecf8;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-base:focus {
+  border-color: #4f74ff;
+  box-shadow: 0 0 0 3px rgba(79,116,255,0.12);
+}
+.input-base::placeholder { color: #4a5578; }
