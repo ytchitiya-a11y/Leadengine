@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadEngine AI — Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060810;--bg1:#0b0f1a;--bg2:#10172a;--bg3:#161e33;--bg4:#1c2540;
+  --border:#1e2a45;--border2:#2a3a60;
+  --t1:#f0f4ff;--t2:#8899cc;--t3:#4a5a80;
+  --blue:#3b82f6;--blue2:#2563eb;--cyan:#06b6d4;
+  --violet:#8b5cf6;--violet2:#7c3aed;
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--pink:#ec4899;
+  --hot:#ff4757;--warm:#ffa502;--cold:#3b82f6;
+  --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:12px;--r2:16px;--r3:20px;
+  --glow-blue:0 0 30px rgba(59,130,246,0.15);
+  --glow-violet:0 0 30px rgba(139,92,246,0.15);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;line-height:1.5}
+
+/* ─── SCROLLBAR ─────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ─── LAYOUT ─────────────────────────────────────────── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;min-height:100vh;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:width .3s ease}
+.sidebar.collapsed{width:64px}
+.main-wrap{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin .3s ease}
+.sidebar.collapsed~.main-wrap{margin-left:64px}
+
+/* ─── SIDEBAR ─────────────────────────────────────────── */
+.logo-area{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;min-height:64px}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.5px;flex-shrink:0;position:relative;overflow:hidden}
+.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
+.logo-text{font-size:14px;font-weight:700;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.logo-text span{color:var(--blue)}
+.sidebar.collapsed .logo-text{opacity:0;width:0}
+.collapse-btn{width:28px;height:28px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);margin-left:auto;transition:all .2s;flex-shrink:0;font-size:11px}
+.collapse-btn:hover{color:var(--t1);background:var(--bg4)}
+
+.nav-section{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;padding:12px 16px 4px;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .nav-section{opacity:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--t2);font-weight:500;position:relative;white-space:nowrap;overflow:hidden;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{color:var(--t1);background:rgba(59,130,246,.05)}
+.nav-item.active{color:#fff}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(var(--blue),var(--violet))}
+.nav-item.active .nav-icon-wrap{background:rgba(59,130,246,.15);color:var(--blue)}
+.nav-icon-wrap{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:14px}
+.nav-label{transition:opacity .2s;white-space:nowrap}
+.sidebar.collapsed .nav-label{opacity:0}
+.nav-badge{margin-left:auto;background:rgba(59,130,246,.2);color:var(--blue);font-size:10px;padding:2px 7px;border-radius:20px;font-family:var(--mono);transition:opacity .2s}
+.sidebar.collapsed .nav-badge{opacity:0}
+
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .2s}
+.user-card:hover{border-color:var(--border2)}
+.user-av{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--violet));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.user-info{flex:1;min-width:0;overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .user-info{opacity:0;width:0}
+.user-name{font-size:12px;font-weight:600;truncate;overflow:hidden;text-overflow:ellipsis}
+.user-plan{font-size:10px;color:var(--blue)}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);transition:opacity .2s}
+.sidebar.collapsed .online-dot{opacity:0}
+
+/* ─── TOPBAR ─────────────────────────────────────────── */
+.topbar{height:60px;background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:sticky;top:0;z-index:50}
+.topbar-search{flex:1;max-width:400px;position:relative}
+.topbar-search input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 12px 8px 36px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border .2s}
+.topbar-search input:focus{border-color:var(--border2)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:14px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:15px;transition:all .2s;position:relative}
+.icon-btn:hover{color:var(--t1);border-color:var(--border2)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--bg1)}
+.topbar-plan{display:flex;align-items:center;gap:6px;padding:6px 12px;background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(139,92,246,.15));border:1px solid rgba(59,130,246,.25);border-radius:20px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer}
+
+/* ─── PAGE ───────────────────────────────────────────── */
+.page{display:none;padding:28px;animation:fadeUp .3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.page-sub{font-size:13px;color:var(--t3);margin-top:3px}
+.page-actions{display:flex;gap:10px;align-items:center}
+
+/* ─── BUTTONS ─────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--font);letter-spacing:.2px}
+.btn-primary{background:linear-gradient(135deg,var(--blue2),var(--violet2));color:#fff;box-shadow:0 0 20px rgba(59,130,246,.25)}
+.btn-primary:hover{box-shadow:0 0 30px rgba(59,130,246,.4);transform:translateY(-1px)}
+.btn-ghost{background:var(--bg2);color:var(--t2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--t1);border-color:var(--border2)}
+.btn-outline-blue{background:rgba(59,130,246,.08);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.btn-outline-blue:hover{background:rgba(59,130,246,.15)}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-xs{padding:4px 9px;font-size:11px;border-radius:7px}
+.btn-icon{width:36px;height:36px;padding:0;justify-content:center;border-radius:var(--r)}
+
+/* ─── CARDS ──────────────────────────────────────────── */
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);padding:20px 22px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600}
+.card-sub{font-size:12px;color:var(--t3);margin-top:2px}
+
+/* ─── METRIC CARDS ───────────────────────────────────── */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.metric-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;position:relative;overflow:hidden;cursor:default;transition:all .3s}
+.metric-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-color,var(--blue)),transparent)}
+.metric-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;filter:blur(30px);opacity:.25}
+.metric-label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-bottom:8px}
+.metric-value{font-size:28px;font-weight:800;letter-spacing:-1px;font-family:var(--mono)}
+.metric-delta{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.delta-up{color:var(--green)}
+.delta-down{color:var(--red)}
+.metric-icon{position:absolute;top:16px;right:16px;font-size:20px;opacity:.5}
+
+/* ─── GRIDS ──────────────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.two-col-main{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+
+/* ─── BADGES ─────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:var(--mono);letter-spacing:.3px}
+.badge-hot{background:rgba(255,71,87,.12);color:var(--hot);border:1px solid rgba(255,71,87,.2)}
+.badge-warm{background:rgba(255,165,2,.12);color:var(--warm);border:1px solid rgba(255,165,2,.2)}
+.badge-cold{background:rgba(59,130,246,.12);color:var(--cold);border:1px solid rgba(59,130,246,.2)}
+.badge-pro{background:rgba(139,92,246,.12);color:var(--violet);border:1px solid rgba(139,92,246,.2)}
+.badge-basic{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.badge-free{background:rgba(74,90,128,.15);color:var(--t3);border:1px solid var(--border)}
+.badge-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.badge-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.badge-cyan{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.2)}
+
+/* ─── TABLE ──────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--border)}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:10px 14px;color:var(--t3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;background:var(--bg2);border-bottom:1px solid var(--border);white-space:nowrap}
+.data-table td{padding:12px 14px;border-bottom:1px solid rgba(30,42,69,.6);color:var(--t2);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.cell-name{color:var(--t1);font-weight:600}
+.cell-mono{font-family:var(--mono);font-size:12px}
+.score-bar-wrap{display:flex;align-items:center;gap:8px}
+.score-track{width:52px;height:4px;background:var(--bg4);border-radius:2px}
+.score-fill{height:100%;border-radius:2px}
+.th-sort{cursor:pointer;user-select:none}
+.th-sort:hover{color:var(--t1)}
+
+/* ─── FILTERS ─────────────────────────────────────────── */
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.filter-input{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 13px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border .2s}
+.filter-input:focus{border-color:var(--border2)}
+.filter-select{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;font-size:13px;color:var(--t2);font-family:var(--font);outline:none;cursor:pointer;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%234a5a80'%3E%3Cpath d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.filter-label{font-size:12px;color:var(--t3);white-space:nowrap}
+
+/* ─── PROGRESS ───────────────────────────────────────── */
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.progress-fill.blue{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.progress-fill.violet{background:linear-gradient(90deg,var(--violet),var(--pink))}
+.progress-fill.green{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.progress-fill.amber{background:linear-gradient(90deg,var(--amber),var(--red))}
+
+/* ─── TOAST ──────────────────────────────────────────── */
+.toast-wrap{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:13px 18px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:toastIn .3s ease;pointer-events:all;max-width:340px}
+.toast.success{border-color:rgba(16,185,129,.3)}
+.toast.error{border-color:rgba(239,68,68,.3)}
+.toast-icon{font-size:16px}
+@keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ─── FORMS ──────────────────────────────────────────── */
+.form-group{margin-bottom:18px}
+.form-label{font-size:12px;color:var(--t3);font-weight:500;display:block;margin-bottom:7px;letter-spacing:.3px}
+.form-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--blue)}
+.form-select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;cursor:pointer;appearance:none}
+.form-textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;resize:vertical;min-height:100px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-hint{font-size:11px;color:var(--t3);margin-top:5px}
+
+/* ─── TABS ───────────────────────────────────────────── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab-btn{padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);letter-spacing:.2px}
+.tab-btn:hover{color:var(--t1)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* ─── MODAL ──────────────────────────────────────────── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:998;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--bg1);border:1px solid var(--border2);border-radius:20px;width:500px;max-width:95vw;padding:28px;animation:modalIn .3s ease}
+@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-title{font-size:18px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--t3);margin-bottom:22px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+/* ─── INTENT CARDS ───────────────────────────────────── */
+.intent-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;transition:all .2s;cursor:pointer}
+.intent-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.intent-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.intent-score-ring{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.intent-problem{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--t1)}
+.intent-tags{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ─── SIDEBAR PANEL ──────────────────────────────────── */
+.detail-panel{position:fixed;right:-500px;top:0;width:480px;height:100vh;background:var(--bg1);border-left:1px solid var(--border2);z-index:200;transition:right .3s ease;overflow-y:auto;padding:24px}
+.detail-panel.open{right:0}
+.panel-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:16px}
+.panel-close:hover{color:var(--t1)}
+
+/* ─── PLANS ──────────────────────────────────────────── */
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
+.plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px 24px;position:relative;transition:all .3s}
+.plan-card.featured{border-color:rgba(59,130,246,.4);background:linear-gradient(160deg,rgba(59,130,246,.08),rgba(139,92,246,.06))}
+.plan-card.featured::before{content:'Most Popular';position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;letter-spacing:.5px}
+.plan-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.plan-price{font-size:36px;font-weight:800;letter-spacing:-2px;margin:16px 0 4px;font-family:var(--mono)}
+.plan-price sup{font-size:16px;letter-spacing:0;vertical-align:top;margin-top:8px;display:inline-block}
+.plan-period{font-size:12px;color:var(--t3)}
+.plan-features{list-style:none;margin:20px 0 24px;display:flex;flex-direction:column;gap:10px}
+.plan-features li{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t2)}
+.plan-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+.plan-features li.no::before{content:'×';color:var(--t3)}
+.plan-features li.no{color:var(--t3)}
+
+/* ─── CHART CONTAINER ────────────────────────────────── */
+.chart-wrap{position:relative;width:100%}
+
+/* ─── AI OUTPUT ──────────────────────────────────────── */
+.ai-output{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;font-size:13px;line-height:1.7;color:var(--t2);min-height:120px;white-space:pre-wrap;font-family:var(--font)}
+.ai-output.loading::after{content:'▊';animation:blink 1s infinite;color:var(--blue)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.output-actions{display:flex;gap:8px;margin-top:12px}
+
+/* ─── SOURCE TOGGLE ──────────────────────────────────── */
+.source-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.source-btn{padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;text-align:center;transition:all .2s;font-size:12px;font-weight:600;color:var(--t2)}
+.source-btn:hover{border-color:var(--border2);color:var(--t1)}
+.source-btn.active{border-color:var(--blue);background:rgba(59,130,246,.08);color:var(--blue)}
+.source-btn .src-icon{font-size:22px;display:block;margin-bottom:8px}
+
+/* ─── SKELETON ───────────────────────────────────────── */
+.skeleton{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ─── GLASSMORPHISM ──────────────────────────────────── */
+.glass{background:rgba(16,23,42,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+
+/* ─── AUTH ───────────────────────────────────────────── */
+.auth-bg{min-height:100vh;background:var(--bg);display:flex;position:relative;overflow:hidden}
+.auth-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;pointer-events:none}
+.auth-orb-1{width:500px;height:500px;background:var(--blue);top:-100px;right:-100px}
+.auth-orb-2{width:400px;height:400px;background:var(--violet);bottom:-100px;left:-100px}
+.auth-left{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;position:relative;z-index:1}
+.auth-right{width:45%;background:linear-gradient(160deg,var(--bg1),rgba(11,15,26,.9));border-left:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:40px}
+.auth-card{width:100%;max-width:400px}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:36px}
+.auth-title{font-size:26px;font-weight:800;letter-spacing:-.6px;margin-bottom:6px}
+.auth-sub{font-size:14px;color:var(--t3);margin-bottom:28px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--t3);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:600;color:var(--t1);transition:all .2s;font-family:var(--font)}
+.social-btn:hover{border-color:var(--border2);background:var(--bg3)}
+.auth-features{max-width:440px}
+.auth-feature{display:flex;align-items:flex-start;gap:14px;margin-bottom:28px}
+.af-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.af-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.af-desc{font-size:13px;color:var(--t3);line-height:1.5}
+
+/* ─── PROGRESS STEPS ─────────────────────────────────── */
+.collect-progress{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:20px}
+.progress-steps{display:flex;gap:10px;flex-direction:column}
+.p-step{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(30,42,69,.4)}
+.p-step:last-child{border-bottom:none}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.step-dot.done{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.step-dot.active{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.25);animation:pulse-step 1.5s infinite}
+.step-dot.pending{background:var(--bg3);color:var(--t3);border:1px solid var(--border)}
+@keyframes pulse-step{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.3)}50%{box-shadow:0 0 0 6px rgba(59,130,246,.0)}}
+.step-text{font-size:13px;font-weight:500}
+.step-sub{font-size:11px;color:var(--t3)}
+.step-count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--blue)}
+
+/* ─── EMAIL TEMPLATE ─────────────────────────────────── */
+.email-template{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s}
+.email-template:hover{border-color:var(--border2);transform:translateY(-2px)}
+.et-preview{height:80px;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:28px}
+.et-body{padding:14px}
+.et-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.et-desc{font-size:12px;color:var(--t3)}
+
+/* ─── FILE CARD ──────────────────────────────────────── */
+.file-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;display:flex;align-items:center;gap:14px;transition:all .2s}
+.file-card:hover{border-color:var(--border2)}
+.file-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.file-name{font-size:13px;font-weight:600;margin-bottom:3px}
+.file-meta{font-size:11px;color:var(--t3)}
+.file-actions{margin-left:auto;display:flex;gap:6px}
+
+/* ─── INSIGHT CARD ───────────────────────────────────── */
+.insight-card{background:linear-gradient(160deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:var(--r2);padding:18px;position:relative;overflow:hidden}
+.insight-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ic-color,var(--blue)),transparent)}
+.insight-icon{font-size:26px;margin-bottom:12px}
+.insight-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.insight-text{font-size:12px;color:var(--t3);line-height:1.5}
+.insight-badge{display:inline-block;margin-top:10px}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:900px){
+  .sidebar{width:64px}.main-wrap{margin-left:64px}
+  .logo-text,.nav-label,.nav-badge,.nav-section,.user-info,.online-dot{opacity:0;width:0;overflow:hidden}
+  .grid-2,.grid-3,.grid-4,.two-col-main,.plans-grid,.form-row{grid-template-columns:1fr}
+  .auth-right{display:none}.auth-left{width:100%}
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  .page{padding:16px}
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .topbar{padding:0 16px}
+  .plans-grid{grid-template-columns:1fr}
+  .source-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH PAGES
+═══════════════════════════════════════════════════════ -->
+<div id="auth-screen" class="auth-bg">
+  <div class="auth-orb auth-orb-1"></div>
+  <div class="auth-orb auth-orb-2"></div>
+
+  <div class="auth-left">
+    <div class="auth-features">
+      <div class="auth-logo">
+        <div class="logo-mark" style="width:42px;height:42px;font-size:16px;border-radius:12px">AI</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;letter-spacing:-.5px">LeadEngine <span style="color:var(--blue)">AI</span></div>
+          <div style="font-size:12px;color:var(--t3)">Intent Intelligence Platform</div>
+        </div>
+      </div>
+
+      <div class="auth-feature">
+        <div class="af-icon" style="background:rgba(59,130,246,.12)">🧠</div>
+        <div>
+          <div class="af-title">AI Intent Detection</div>
+          <div class="af-desc">Detects business problems, urgency, and conversion potential with 90%+ accuracy</div>
+        </div>
+      </div>
+      <div class="auth-feature">
+        <div class="af-icon" style="background:rgba(139,92,246,.12)">🔥</div>
+        <div>
+          <div class="af-title">HOT Lead Scoring</div>
+          <div class="af-desc">Every lead scored 0–100. HOT leads identified automatically — no manual work</div>
+        </div>
+      </div>
+      <div class="auth-feature">
+        <div class="af-icon" style="background:rgba(16,185,129,.12)">📤</div>
+        <div>
+          <div class="af-title">Instant Export + Outreach</div>
+          <div class="af-desc">One-click CSV/PDF + AI-generated personalized messages for each lead</div>
+        </div>
+      </div>
+
+      <div style="margin-top:36px;padding:18px 20px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:14px">
+        <div style="font-size:28px;font-weight:800;letter-spacing:-1px;font-family:var(--mono);color:var(--blue)">₹2.4L+</div>
+        <div style="font-size:13px;color:var(--t3);margin-top:4px">Revenue generated by our users last month</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div id="login-form" class="auth-card">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your LeadEngine AI account</div>
+
+      <button class="social-btn" onclick="showToast('Google login coming soon!','success')">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider">or</div>
+
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" id="login-email" type="email" placeholder="you@company.com" value="demo@leadengine.ai">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-pass" type="password" placeholder="••••••••" value="password123">
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);cursor:pointer">
+          <input type="checkbox" checked> Remember me
+        </label>
+        <span style="font-size:13px;color:var(--blue);cursor:pointer">Forgot password?</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="doLogin()">Sign In →</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--t3)">No account? <span style="color:var(--blue);cursor:pointer" onclick="showSignup()">Sign up free</span></div>
+    </div>
+
+    <div id="signup-form" class="auth-card" style="display:none">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Start generating AI-powered leads today</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-input" placeholder="Rahul"></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" placeholder="Sharma"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="you@company.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Min 8 characters"></div>
+      <div class="form-group">
+        <label class="form-label">Select Plan</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="source-btn active" onclick="selectPlan(this,'free')" style="padding:12px">
+            <div style="font-size:16px;font-weight:800;font-family:var(--mono)">Free</div>
+            <div style="font-size:11px;color:var(--t3)">Get started</div>
+          </div>
+          <div class="source-btn" onclick="selectPlan(this,'pro')" style="padding:12px">
+            <div style="font-size:16px;font-weight:800;font-family:var(--mono)">₹499<span style="font-size:11px">/mo</span></div>
+            <div style="font-size:11px;color:var(--t3)">Basic plan</div>
+          </div>
+        </div>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--t3);margin-bottom:20px;cursor:pointer;line-height:1.5">
+        <input type="checkbox" style="margin-top:2px"> I agree to the <span style="color:var(--blue)">&nbsp;Terms of Service&nbsp;</span> and <span style="color:var(--blue)">&nbsp;Privacy Policy</span>
+      </label>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="doLogin()">Create Account →</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--t3)">Already have an account? <span style="color:var(--blue);cursor:pointer" onclick="showLogin()">Sign in</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════════ -->
+<div id="app-screen" class="app" style="display:none">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="logo-area">
+    <div class="logo-mark">AI</div>
+    <div class="logo-text">Lead<span>Engine</span></div>
+    <div class="collapse-btn" onclick="toggleSidebar()">◀</div>
+  </div>
+
+  <div class="nav" style="flex:1;padding:12px 8px;overflow-y:auto">
+    <div class="nav-section">Main</div>
+    <button class="nav-item active" onclick="showPage('dashboard')"><div class="nav-icon-wrap">▤</div><span class="nav-label">Dashboard</span></button>
+
+    <div class="nav-section">Intelligence</div>
+    <button class="nav-item" onclick="showPage('collect')"><div class="nav-icon-wrap">⊕</div><span class="nav-label">Collect Leads</span></button>
+    <button class="nav-item" onclick="showPage('leads')"><div class="nav-icon-wrap">◈</div><span class="nav-label">Lead Manager</span><span class="nav-badge">248</span></button>
+    <button class="nav-item" onclick="showPage('intent')"><div class="nav-icon-wrap">◉</div><span class="nav-label">Intent Analysis</span><span class="nav-badge">54</span></button>
+
+    <div class="nav-section">AI Tools</div>
+    <button class="nav-item" onclick="showPage('messenger')"><div class="nav-icon-wrap">✉</div><span class="nav-label">AI Messenger</span></button>
+    <button class="nav-item" onclick="showPage('export')"><div class="nav-icon-wrap">↓</div><span class="nav-label">Export Center</span></button>
+    <button class="nav-item" onclick="showPage('email')"><div class="nav-icon-wrap">@</div><span class="nav-label">Email Center</span></button>
+    <button class="nav-item" onclick="showPage('files')"><div class="nav-icon-wrap">☁</div><span class="nav-label">File Storage</span></button>
+
+    <div class="nav-section">Account</div>
+    <button class="nav-item" onclick="showPage('billing')"><div class="nav-icon-wrap">◎</div><span class="nav-label">Billing</span></button>
+    <button class="nav-item" onclick="showPage('admin')"><div class="nav-icon-wrap">⊞</div><span class="nav-label">Admin Panel</span></button>
+    <button class="nav-item" onclick="showPage('settings')"><div class="nav-icon-wrap">⚙</div><span class="nav-label">Settings</span></button>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card" onclick="showPage('settings')">
+      <div class="user-av">RS</div>
+      <div class="user-info">
+        <div class="user-name">Rahul Sharma</div>
+        <div class="user-plan">Pro Plan ✦</div>
+      </div>
+      <div class="online-dot"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-wrap">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search leads, businesses, categories..." id="global-search">
+    </div>
+    <div class="topbar-right">
+      <div class="icon-btn" title="Notifications">🔔<div class="notif-dot"></div></div>
+      <div class="icon-btn" title="Help">?</div>
+      <div class="topbar-plan" onclick="showPage('billing')">✦ Pro Plan</div>
+    </div>
+  </header>
+
+  <!-- ═══ DASHBOARD ═══════════════════════════════════ -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div><div class="page-title">Dashboard</div><div class="page-sub">Your AI lead intelligence overview</div></div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Refreshing data...','success')">↻ Refresh</button>
+        <button class="btn btn-primary btn-sm" onclick="showPage('collect')">⊕ New Collection</button>
+      </div>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card" style="--accent-color:var(--blue)">
+        <div class="metric-glow" style="background:var(--blue)"></div>
+        <div class="metric-label">Total Leads</div>
+        <div class="metric-value" style="color:var(--blue)">2,481</div>
+        <div class="metric-delta delta-up">▲ 12.4% this week</div>
+        <div class="metric-icon">◈</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--hot)">
+        <div class="metric-glow" style="background:var(--hot)"></div>
+        <div class="metric-label">HOT Leads 🔥</div>
+        <div class="metric-value" style="color:var(--hot)">347</div>
+        <div class="metric-delta delta-up">▲ 8 new today</div>
+        <div class="metric-icon">🔥</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--violet)">
+        <div class="metric-glow" style="background:var(--violet)"></div>
+        <div class="metric-label">Intent Signals</div>
+        <div class="metric-value" style="color:var(--violet)">1,092</div>
+        <div class="metric-delta delta-up">▲ 34 detected today</div>
+        <div class="metric-icon">◉</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--green)">
+        <div class="metric-glow" style="background:var(--green)"></div>
+        <div class="metric-label">Revenue Impact</div>
+        <div class="metric-value" style="color:var(--green)">₹4.8L</div>
+        <div class="metric-delta delta-up">▲ 22% vs last month</div>
+        <div class="metric-icon">₹</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--cyan)">
+        <div class="metric-glow" style="background:var(--cyan)"></div>
+        <div class="metric-label">Active Searches</div>
+        <div class="metric-value" style="color:var(--cyan)">12</div>
+        <div class="metric-delta" style="color:var(--t3)">● 3 running now</div>
+        <div class="metric-icon">⊕</div>
+      </div>
+      <div class="metric-card" style="--accent-color:var(--amber)">
+        <div class="metric-glow" style="background:var(--amber)"></div>
+        <div class="metric-label">Avg Lead Score</div>
+        <div class="metric-value" style="color:var(--amber)">72.4</div>
+        <div class="metric-delta delta-up">▲ +4.2 this week</div>
+        <div class="metric-icon">★</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="two-col-main" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Lead Growth</div><div class="card-sub">Last 30 days</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-xs active-tab">30D</button>
+            <button class="btn btn-ghost btn-xs">7D</button>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:200px"><canvas id="growthChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Lead Priority Split</div></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="priorityChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <!-- Industry Distribution -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Top Industries</div><div class="card-sub">By lead count</div></div>
+        <div id="industry-bars"></div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">🧠 AI Insights</div><div class="card-sub">Real-time recommendations</div></div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="ai-insights"></div>
+      </div>
+    </div>
+
+    <!-- Recent Leads Table -->
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Recent Leads</div><div class="card-sub">Latest collected intelligence</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('leads')">View All →</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="dash-leads"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COLLECT PAGE ════════════════════════════════ -->
+  <div id="page-collect" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Data Collection</div><div class="page-sub">Search and collect business leads from multiple sources</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title" style="margin-bottom:16px">Collection Parameters</div>
+          <div class="form-group">
+            <label class="form-label">Search Keyword</label>
+            <input class="form-input" id="c-keyword" placeholder="e.g. dental clinics, restaurants, gyms, law firms...">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input class="form-input" id="c-location" placeholder="Mumbai, Delhi, Bangalore...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Industry</label>
+              <select class="form-select" id="c-industry">
+                <option>Healthcare</option><option>Restaurant</option><option>Legal Services</option>
+                <option>Real Estate</option><option>Education</option><option>Retail</option>
+                <option>IT Services</option><option>Finance</option><option>Fitness</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data Sources</label>
+            <div class="source-grid">
+              <div class="source-btn active" onclick="this.classList.toggle('active')"><span class="src-icon">🔍</span>Google</div>
+              <div class="source-btn" onclick="this.classList.toggle('active')"><span class="src-icon">💼</span>LinkedIn</div>
+              <div class="source-btn active" onclick="this.classList.toggle('active')"><span class="src-icon">📱</span>Reddit</div>
+              <div class="source-btn" onclick="this.classList.toggle('active')"><span class="src-icon">📘</span>Facebook</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Max Results</label>
+              <select class="form-select"><option>20</option><option>50</option><option>100</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Min Score</label>
+              <input class="form-input" type="number" placeholder="0" value="40">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="startCollection()">⊕ Start Collection</button>
+            <button class="btn btn-ghost" onclick="showToast('AI analyze queued','success')">🧠 AI Analyze</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Live Status -->
+        <div class="collect-progress" id="collect-status" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:14px;font-weight:700">Collection Running...</div>
+            <span class="badge badge-green">● Live</span>
+          </div>
+          <div class="progress-bar" style="margin-bottom:14px">
+            <div class="progress-fill blue" id="collect-progress-bar" style="width:0%"></div>
+          </div>
+          <div class="progress-steps" id="collect-steps"></div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title" style="margin-bottom:14px">Collection Summary</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+              <div style="font-size:24px;font-weight:800;color:var(--blue);font-family:var(--mono)" id="stat-collected">0</div>
+              <div style="font-size:11px;color:var(--t3)">Collected</div>
+            </div>
+            <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+              <div style="font-size:24px;font-weight:800;color:var(--hot);font-family:var(--mono)" id="stat-hot">0</div>
+              <div style="font-size:11px;color:var(--t3)">HOT Leads</div>
+            </div>
+            <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+              <div style="font-size:24px;font-weight:800;color:var(--violet);font-family:var(--mono)" id="stat-intent">0</div>
+              <div style="font-size:11px;color:var(--t3)">Intent Matches</div>
+            </div>
+            <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+              <div style="font-size:24px;font-weight:800;color:var(--green);font-family:var(--mono)" id="stat-avg">-</div>
+              <div style="font-size:11px;color:var(--t3)">Avg Score</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Recent Searches</div>
+          <div id="recent-searches" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEADS PAGE ══════════════════════════════════ -->
+  <div id="page-leads" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Lead Manager</div><div class="page-sub">Full intelligence database — <span id="lead-count" style="color:var(--blue)">248 leads</span></div></div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showPage('export')">↓ Export</button>
+        <button class="btn btn-primary btn-sm" onclick="showPage('collect')">⊕ Add More</button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input class="filter-input" placeholder="🔍 Search leads..." id="lead-search" oninput="filterLeads()" style="width:220px">
+      <select class="filter-select" id="lead-priority-filter" onchange="filterLeads()">
+        <option value="">All Priorities</option><option value="HOT">🔥 HOT</option><option value="WARM">♨ WARM</option><option value="COLD">❄ COLD</option>
+      </select>
+      <select class="filter-select" id="lead-cat-filter" onchange="filterLeads()">
+        <option value="">All Categories</option><option value="Healthcare">Healthcare</option><option value="Restaurant">Restaurant</option><option value="Legal">Legal</option><option value="Fitness">Fitness</option><option value="IT">IT</option>
+      </select>
+      <span class="filter-label" style="margin-left:auto" id="filtered-count">248 results</span>
+      <button class="btn btn-ghost btn-sm" onclick="showToast('Bulk actions coming soon!','success')">⊞ Bulk Actions</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table" id="leads-table"></table>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:13px;color:var(--t3)">
+      <span id="pagination-info">Showing 1–20 of 248</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-xs">← Prev</button>
+        <button class="btn btn-ghost btn-xs active-tab">1</button>
+        <button class="btn btn-ghost btn-xs">2</button>
+        <button class="btn btn-ghost btn-xs">3</button>
+        <button class="btn btn-ghost btn-xs">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ INTENT PAGE ══════════════════════════════════ -->
+  <div id="page-intent" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Intent Analysis</div><div class="page-sub">Business problem signals detected from Reddit & Facebook</div></div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" onclick="showPage('collect')">⊕ Collect More</button>
+      </div>
+    </div>
+
+    <!-- Trending Problems -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><div class="card-title">🔥 Trending Business Problems</div><div class="card-sub">High-intent signals from social media</div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="badge badge-hot" style="padding:6px 14px;font-size:12px">Need more customers</span>
+        <span class="badge badge-warm" style="padding:6px 14px;font-size:12px">Marketing help needed</span>
+        <span class="badge badge-hot" style="padding:6px 14px;font-size:12px">No online presence</span>
+        <span class="badge badge-cyan" style="padding:6px 14px;font-size:12px">Hiring challenges</span>
+        <span class="badge badge-warm" style="padding:6px 14px;font-size:12px">Facebook ads failing</span>
+        <span class="badge badge-pro" style="padding:6px 14px;font-size:12px">Need automation</span>
+        <span class="badge badge-hot" style="padding:6px 14px;font-size:12px">Low reviews count</span>
+        <span class="badge badge-green" style="padding:6px 14px;font-size:12px">Lead generation</span>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Intent by Urgency</div></div>
+        <div class="chart-wrap" style="height:180px"><canvas id="urgencyChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Intent by Category</div></div>
+        <div id="intent-category-bars"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Intent Signal Cards</div></div>
+        <div style="display:flex;gap:8px">
+          <select class="filter-select" style="font-size:12px">
+            <option>All Sources</option><option>Reddit</option><option>Facebook</option>
+          </select>
+          <select class="filter-select" style="font-size:12px">
+            <option>All Urgency</option><option>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2" id="intent-cards-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══ MESSENGER PAGE ══════════════════════════════ -->
+  <div id="page-messenger" class="page">
+    <div class="page-header">
+      <div><div class="page-title">AI Message Generator</div><div class="page-sub">Generate personalized outreach in seconds</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:18px">Message Parameters</div>
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input class="form-input" id="msg-biz" placeholder="Alpha Dental Clinic">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="msg-cat">
+              <option>Healthcare / Clinic</option><option>Restaurant</option><option>Legal Services</option>
+              <option>Real Estate</option><option>Fitness</option><option>E-commerce</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-input" id="msg-loc" placeholder="Mumbai">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Their Problem / Intent</label>
+          <textarea class="form-textarea" id="msg-intent" placeholder="e.g. No website, low rating, needs more patients, struggling with marketing..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tone</label>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <div class="source-btn active" onclick="selectTone(this,'professional')" style="padding:10px;font-size:12px">Professional</div>
+            <div class="source-btn" onclick="selectTone(this,'friendly')" style="padding:10px;font-size:12px">Friendly</div>
+            <div class="source-btn" onclick="selectTone(this,'aggressive')" style="padding:10px;font-size:12px">Aggressive</div>
+            <div class="source-btn" onclick="selectTone(this,'sales')" style="padding:10px;font-size:12px">Sales</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="generateMsg('email')">✉ Generate Email</button>
+          <button class="btn btn-outline-blue" onclick="generateMsg('linkedin')">💼 LinkedIn DM</button>
+          <button class="btn btn-outline-blue" onclick="generateMsg('whatsapp')">💬 WhatsApp</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div><div class="card-title" id="msg-type-label">✉ Email Message</div><div class="card-sub" id="msg-subject-line">Subject will appear here</div></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-xs" onclick="copyMsg()">Copy</button>
+              <button class="btn btn-ghost btn-xs" onclick="generateMsg('email')">↻ Regen</button>
+            </div>
+          </div>
+          <div class="ai-output" id="msg-output">Your AI-generated message will appear here. Fill in the form and click Generate.</div>
+        </div>
+
+        <!-- Message History -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Recent Messages</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="padding:12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);cursor:pointer">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;font-weight:600">Alpha Dental Clinic</span>
+                <span class="badge badge-cyan">Email</span>
+              </div>
+              <div style="font-size:12px;color:var(--t3)">Professional · 2h ago</div>
+            </div>
+            <div style="padding:12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);cursor:pointer">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;font-weight:600">City Gym & Fitness</span>
+                <span class="badge badge-pro">LinkedIn</span>
+              </div>
+              <div style="font-size:12px;color:var(--t3)">Aggressive · Yesterday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EXPORT CENTER ════════════════════════════════ -->
+  <div id="page-export" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Export Center</div><div class="page-sub">Download your lead reports and AI insights</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card" style="text-align:center;padding:32px;background:linear-gradient(160deg,rgba(59,130,246,.06),rgba(6,182,212,.04));border-color:rgba(59,130,246,.2);cursor:pointer" onclick="doExport('csv')">
+        <div style="font-size:40px;margin-bottom:14px">📊</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:6px">Export CSV</div>
+        <div style="font-size:13px;color:var(--t3);margin-bottom:20px">Spreadsheet-ready data for all 248 leads including scores, contacts, and intent data</div>
+        <button class="btn btn-outline-blue">↓ Download CSV</button>
+      </div>
+      <div class="card" style="text-align:center;padding:32px;background:linear-gradient(160deg,rgba(139,92,246,.06),rgba(236,72,153,.04));border-color:rgba(139,92,246,.2);cursor:pointer" onclick="doExport('pdf')">
+        <div style="font-size:40px;margin-bottom:14px">📋</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:6px">Export PDF Report</div>
+        <div style="font-size:13px;color:var(--t3);margin-bottom:20px">Professional A4 report with charts, HOT leads summary, and AI insights</div>
+        <button class="btn btn-primary">↓ Generate PDF</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><div class="card-title">Export Options</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="form-group"><label class="form-label">Include Leads</label>
+            <select class="form-select"><option>All Leads (248)</option><option>HOT Only (87)</option><option>With Website</option></select></div>
+          <div class="form-group"><label class="form-label">Priority Filter</label>
+            <select class="form-select"><option>All Priorities</option><option>HOT + WARM</option><option>HOT Only</option></select></div>
+        </div>
+        <div>
+          <div class="form-group"><label class="form-label">Date Range</label>
+            <select class="form-select"><option>Last 30 days</option><option>Last 7 days</option><option>All time</option></select></div>
+          <div class="form-group"><label class="form-label">Include Intent Data</label>
+            <select class="form-select"><option>Yes — Include Intent</option><option>No</option></select></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="doExport('all')">↓ Export Everything</button>
+    </div>
+
+    <!-- Export History -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Export History</div></div>
+      <div id="export-history" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+
+  <!-- ═══ EMAIL CENTER ═════════════════════════════════ -->
+  <div id="page-email" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Email Center</div><div class="page-sub">Manage and send your AI-powered outreach</div></div>
+      <button class="btn btn-primary btn-sm">+ New Campaign</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="setTab(this,'tab-templates')">Templates</button>
+      <button class="tab-btn" onclick="setTab(this,'tab-sent')">Sent Emails</button>
+      <button class="tab-btn" onclick="setTab(this,'tab-send')">Send Email</button>
+    </div>
+
+    <div id="tab-templates">
+      <div class="grid-3" id="email-templates-grid"></div>
+    </div>
+    <div id="tab-sent" style="display:none">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Recipient</th><th>Subject</th><th>Status</th><th>Sent At</th><th>Action</th></tr></thead>
+          <tbody id="sent-emails-table"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-send" style="display:none">
+      <div class="card" style="max-width:600px">
+        <div class="card-title" style="margin-bottom:18px">Send Outreach Email</div>
+        <div class="form-group"><label class="form-label">To</label><input class="form-input" placeholder="recipient@business.com"></div>
+        <div class="form-group"><label class="form-label">Subject</label><input class="form-input" placeholder="Quick idea for [Business Name]" value="Quick idea for your clinic — more patients guaranteed"></div>
+        <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" style="min-height:160px" placeholder="Your message...">Hi there,
+
+I noticed your clinic might be looking for help with getting more patients online...
+
+Let's connect!</textarea></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="showToast('Test email sent!','success')">✉ Send Test</button>
+          <button class="btn btn-primary" onclick="showToast('Email sent successfully!','success')">Send Email →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FILE STORAGE ═════════════════════════════════ -->
+  <div id="page-files" class="page">
+    <div class="page-header">
+      <div><div class="page-title">File Storage</div><div class="page-sub">Cloudinary-powered exports and reports</div></div>
+    </div>
+
+    <!-- Storage Stats -->
+    <div class="grid-3" style="margin-bottom:24px">
+      <div style="padding:18px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px">Used Storage</div>
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--blue)">2.4 GB</div>
+        <div class="progress-bar" style="margin-top:10px"><div class="progress-fill blue" style="width:9.6%"></div></div>
+        <div style="font-size:11px;color:var(--t3);margin-top:6px">9.6% of 25 GB free tier</div>
+      </div>
+      <div style="padding:18px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px">Total Files</div>
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--violet)">47</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:8px">32 CSV · 11 PDF · 4 ZIP</div>
+      </div>
+      <div style="padding:18px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px">Last Export</div>
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--green)">2h ago</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:8px">leads_export_may2025.csv</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">All Files</div>
+        <input class="filter-input" placeholder="Search files..." style="width:200px">
+      </div>
+      <div id="files-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+
+  <!-- ═══ BILLING PAGE ════════════════════════════════ -->
+  <div id="page-billing" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Subscription & Billing</div><div class="page-sub">Manage your plan and payments</div></div>
+    </div>
+
+    <!-- Current Plan -->
+    <div style="padding:20px 24px;background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.06));border:1px solid rgba(59,130,246,.25);border-radius:20px;margin-bottom:28px;display:flex;align-items:center;gap:20px">
+      <div style="font-size:36px">✦</div>
+      <div style="flex:1">
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px">Pro Plan — Active</div>
+        <div style="font-size:13px;color:var(--t3)">₹999/month · Renews on June 15, 2025 · Next billing in 12 days</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost btn-sm">Cancel Plan</button>
+        <button class="btn btn-primary btn-sm">↑ Upgrade</button>
+      </div>
+    </div>
+
+    <!-- Plans -->
+    <div class="plans-grid" style="margin-bottom:28px">
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div style="font-size:13px;color:var(--t3)">Get started</div>
+        <div class="plan-price"><sup>₹</sup>0</div>
+        <div class="plan-period">forever</div>
+        <ul class="plan-features">
+          <li>View leads (read only)</li>
+          <li>5 collections/month</li>
+          <li>Basic analytics</li>
+          <li class="no">AI intent detection</li>
+          <li class="no">CSV/PDF export</li>
+          <li class="no">AI message generator</li>
+        </ul>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center">Current</button>
+      </div>
+
+      <div class="plan-card featured">
+        <div class="plan-name">Basic</div>
+        <div style="font-size:13px;color:var(--t3)">For growing agencies</div>
+        <div class="plan-price"><sup>₹</sup>499</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features">
+          <li>100 lead collections/mo</li>
+          <li>AI intent detection</li>
+          <li>CSV + PDF export</li>
+          <li>AI message generator</li>
+          <li>Reddit + Facebook data</li>
+          <li class="no">Admin panel access</li>
+        </ul>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="initiatePayment('basic')">Upgrade to Basic →</button>
+      </div>
+
+      <div class="plan-card" style="border-color:rgba(139,92,246,.3)">
+        <div class="plan-name">Pro</div>
+        <div style="font-size:13px;color:var(--t3)">Full power, no limits</div>
+        <div class="plan-price" style="color:var(--violet)"><sup>₹</sup>999</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features">
+          <li>Unlimited collections</li>
+          <li>All AI features</li>
+          <li>Admin panel</li>
+          <li>Priority AI processing</li>
+          <li>Team accounts (5)</li>
+          <li>API access</li>
+        </ul>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,var(--violet2),var(--pink))" onclick="initiatePayment('pro')">Get Pro ✦</button>
+      </div>
+    </div>
+
+    <!-- Billing History -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Billing History</div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Plan</th><th>Amount</th><th>Status</th><th>Invoice</th></tr></thead>
+          <tbody>
+            <tr><td>May 3, 2025</td><td>Pro Plan</td><td class="cell-mono">₹999</td><td><span class="badge badge-green">Paid</span></td><td><span style="color:var(--blue);cursor:pointer;font-size:12px">↓ Download</span></td></tr>
+            <tr><td>Apr 3, 2025</td><td>Pro Plan</td><td class="cell-mono">₹999</td><td><span class="badge badge-green">Paid</span></td><td><span style="color:var(--blue);cursor:pointer;font-size:12px">↓ Download</span></td></tr>
+            <tr><td>Mar 3, 2025</td><td>Basic Plan</td><td class="cell-mono">₹499</td><td><span class="badge badge-green">Paid</span></td><td><span style="color:var(--blue);cursor:pointer;font-size:12px">↓ Download</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ADMIN PAGE ════════════════════════════════════ -->
+  <div id="page-admin" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Admin Dashboard</div><div class="page-sub">Platform management & analytics</div></div>
+    </div>
+
+    <div class="metrics-grid" style="margin-bottom:24px">
+      <div class="metric-card" style="--accent-color:var(--blue)"><div class="metric-glow" style="background:var(--blue)"></div><div class="metric-label">Total Users</div><div class="metric-value" style="color:var(--blue)">1,842</div><div class="metric-delta delta-up">▲ 23 new this week</div><div class="metric-icon">◎</div></div>
+      <div class="metric-card" style="--accent-color:var(--green)"><div class="metric-glow" style="background:var(--green)"></div><div class="metric-label">MRR</div><div class="metric-value" style="color:var(--green)">₹1.8L</div><div class="metric-delta delta-up">▲ 18% MoM</div><div class="metric-icon">₹</div></div>
+      <div class="metric-card" style="--accent-color:var(--violet)"><div class="metric-glow" style="background:var(--violet)"></div><div class="metric-label">Active Subs</div><div class="metric-value" style="color:var(--violet)">412</div><div class="metric-delta delta-up">▲ 8 new today</div><div class="metric-icon">✦</div></div>
+      <div class="metric-card" style="--accent-color:var(--cyan)"><div class="metric-glow" style="background:var(--cyan)"></div><div class="metric-label">AI API Calls</div><div class="metric-value" style="color:var(--cyan)">48.2K</div><div class="metric-delta">● This month</div><div class="metric-icon">🧠</div></div>
+    </div>
+
+    <div class="two-col-main" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Revenue Chart</div></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="adminRevChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Plan Distribution</div></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="adminPlanChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab-btn active" onclick="setAdminTab(this,'admin-users-tab')">Users</button>
+      <button class="tab-btn" onclick="setAdminTab(this,'admin-payments-tab')">Payments</button>
+      <button class="tab-btn" onclick="setAdminTab(this,'admin-api-tab')">API Usage</button>
+    </div>
+
+    <div id="admin-users-tab">
+      <div class="filter-bar" style="margin-bottom:14px">
+        <input class="filter-input" placeholder="Search users..." style="width:220px">
+        <select class="filter-select"><option>All Plans</option><option>Free</option><option>Basic</option><option>Pro</option></select>
+        <span style="font-size:12px;color:var(--t3);margin-left:auto">1,842 total</span>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="admin-users-table"></table>
+      </div>
+    </div>
+    <div id="admin-payments-tab" style="display:none">
+      <div class="table-wrap">
+        <table class="data-table" id="admin-payments-table"></table>
+      </div>
+    </div>
+    <div id="admin-api-tab" style="display:none">
+      <div class="grid-3">
+        <div class="card"><div class="metric-label">Intent Detections</div><div class="metric-value" style="color:var(--violet)">18,420</div><div class="metric-delta delta-up">This month</div></div>
+        <div class="card"><div class="metric-label">Lead Analyses</div><div class="metric-value" style="color:var(--blue)">24,100</div><div class="metric-delta delta-up">This month</div></div>
+        <div class="card"><div class="metric-label">Messages Generated</div><div class="metric-value" style="color:var(--green)">5,680</div><div class="metric-delta delta-up">This month</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SETTINGS PAGE ════════════════════════════════ -->
+  <div id="page-settings" class="page">
+    <div class="page-header">
+      <div><div class="page-title">Settings</div><div class="page-sub">Manage your account and preferences</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="setTab(this,'set-profile')">Profile</button>
+      <button class="tab-btn" onclick="setTab(this,'set-notif')">Notifications</button>
+      <button class="tab-btn" onclick="setTab(this,'set-api')">API Keys</button>
+      <button class="tab-btn" onclick="setTab(this,'set-security')">Security</button>
+    </div>
+
+    <div id="set-profile">
+      <div class="card" style="max-width:580px">
+        <div class="card-title" style="margin-bottom:20px">Profile Information</div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+          <div class="user-av" style="width:60px;height:60px;font-size:20px;border-radius:16px">RS</div>
+          <div>
+            <button class="btn btn-ghost btn-sm">Change Photo</button>
+            <div style="font-size:12px;color:var(--t3);margin-top:6px">JPG, PNG max 2MB</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Rahul"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Sharma"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" value="rahul@leadengine.ai"></div>
+        <div class="form-group"><label class="form-label">Company</label><input class="form-input" value="Digital Growth Agency"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="+91 98765 43210"></div>
+        <button class="btn btn-primary" onclick="showToast('Profile saved!','success')">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="set-notif" style="display:none">
+      <div class="card" style="max-width:580px">
+        <div class="card-title" style="margin-bottom:20px">Notification Preferences</div>
+        <div id="notif-settings" style="display:flex;flex-direction:column;gap:0"></div>
+      </div>
+    </div>
+
+    <div id="set-api" style="display:none">
+      <div class="card" style="max-width:580px">
+        <div class="card-title" style="margin-bottom:20px">API Configuration</div>
+        <div class="form-group"><label class="form-label">OpenAI API Key</label>
+          <div style="display:flex;gap:8px"><input class="form-input" type="password" value="sk-proj-xxxxxxxxxxxxxxxx" style="flex:1"><button class="btn btn-ghost btn-sm">Show</button></div></div>
+        <div class="form-group"><label class="form-label">SerpAPI Key</label>
+          <div style="display:flex;gap:8px"><input class="form-input" type="password" value="xxxxxxxxxxxxxxxx" style="flex:1"><button class="btn btn-ghost btn-sm">Show</button></div></div>
+        <div class="form-group"><label class="form-label">Reddit Client ID</label>
+          <div style="display:flex;gap:8px"><input class="form-input" type="password" value="rxxxxxxxx" style="flex:1"><button class="btn btn-ghost btn-sm">Show</button></div></div>
+        <div class="form-group"><label class="form-label">Your LeadEngine API Key</label>
+          <div style="display:flex;gap:8px"><input class="form-input" value="le_live_xxxxxxxxxxxxxxxxxxxxxxxx" style="flex:1;font-family:var(--mono);font-size:12px"><button class="btn btn-ghost btn-sm" onclick="showToast('Copied!','success')">Copy</button></div>
+          <div class="form-hint">Use this to connect LeadEngine to external tools like n8n or Zapier</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('API keys saved!','success')">Save Keys</button>
+      </div>
+    </div>
+
+    <div id="set-security" style="display:none">
+      <div class="card" style="max-width:580px">
+        <div class="card-title" style="margin-bottom:20px">Security Settings</div>
+        <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="Enter current password"></div>
+        <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Min 8 characters"></div>
+        <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" placeholder="Repeat new password"></div>
+        <button class="btn btn-primary" onclick="showToast('Password updated!','success')">Update Password</button>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px">2-Factor Authentication</div>
+          <button class="btn btn-outline-blue">Enable 2FA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main-wrap -->
+</div><!-- end app -->
+
+<!-- ─── LEAD DETAIL PANEL ─────────────────────────────── -->
+<div class="detail-panel" id="lead-detail">
+  <div class="panel-close" onclick="closePanel()">✕</div>
+  <div id="panel-content"></div>
+</div>
+
+<!-- ─── PAYMENT MODAL ─────────────────────────────────── -->
+<div class="modal-bg" id="payment-modal">
+  <div class="modal">
+    <div class="modal-title">Upgrade Plan</div>
+    <div class="modal-sub" id="payment-plan-desc">Complete your payment via Razorpay</div>
+    <div style="padding:20px;background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(139,92,246,.04));border:1px solid rgba(59,130,246,.15);border-radius:var(--r2);margin-bottom:16px">
+      <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--blue)" id="payment-amount">₹999</div>
+      <div style="font-size:13px;color:var(--t3);margin-top:4px">One-time monthly charge · Cancel anytime</div>
+    </div>
+    <div class="form-group"><label class="form-label">Cardholder Name</label><input class="form-input" placeholder="Rahul Sharma" value="Rahul Sharma"></div>
+    <div class="form-group"><label class="form-label">Card Number</label><input class="form-input" placeholder="4111 1111 1111 1111"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Expiry</label><input class="form-input" placeholder="MM/YY"></div>
+      <div class="form-group"><label class="form-label">CVV</label><input class="form-input" placeholder="123"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:var(--r);margin-bottom:4px">
+      <span style="color:var(--green)">🔒</span>
+      <span style="font-size:12px;color:var(--t3)">Secured by Razorpay · 256-bit SSL encryption</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('payment-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="processPayment()">Pay Now →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST CONTAINER ───────────────────────────────── -->
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const LEADS = [
+  {id:1,name:'Alpha Dental Clinic',cat:'Healthcare',loc:'Mumbai',src:'Google',rating:3.8,reviews:42,intent:87,score:92,priority:'HOT',status:'New',website:false,phone:'9876543210',reason:'No website, low rating, needs more patients'},
+  {id:2,name:'BrightSmile Orthodontics',cat:'Healthcare',loc:'Pune',src:'Google',rating:4.5,reviews:210,intent:45,score:51,priority:'WARM',status:'Contacted',website:true,phone:'9812345678',reason:'High reviews, good potential for SEO'},
+  {id:3,name:'City Gym & Fitness',cat:'Fitness',loc:'Bangalore',src:'Reddit',rating:3.2,reviews:18,intent:91,score:88,priority:'HOT',status:'New',website:false,phone:'',reason:'No website, very low reviews, intent signal found'},
+  {id:4,name:'GreenLeaf Restaurant',cat:'Restaurant',loc:'Delhi',src:'Google',rating:4.1,reviews:320,intent:32,score:38,priority:'COLD',status:'Ignored',website:true,phone:'9900112233',reason:'Well established, limited opportunity'},
+  {id:5,name:'QuickFix Auto Repair',cat:'Automotive',loc:'Chennai',src:'Google',rating:2.9,reviews:7,intent:78,score:85,priority:'HOT',status:'New',website:false,phone:'9700000001',reason:'Very low rating, few reviews, no web presence'},
+  {id:6,name:'Sunrise Law Associates',cat:'Legal',loc:'Hyderabad',src:'LinkedIn',rating:4.7,reviews:89,intent:72,score:76,priority:'HOT',status:'New',website:true,phone:'9600000002',reason:'Actively hiring, LinkedIn signal'},
+  {id:7,name:'MediCare Pharmacy',cat:'Healthcare',loc:'Kolkata',src:'Google',rating:3.5,reviews:55,intent:65,score:69,priority:'WARM',status:'New',website:false,phone:'9500000003',reason:'No website, moderate rating'},
+  {id:8,name:'TechHub IT Solutions',cat:'IT',loc:'Bangalore',src:'Reddit',rating:4.0,reviews:130,intent:88,score:82,priority:'HOT',status:'Contacted',website:true,phone:'9400000004',reason:'High intent on Reddit, B2B opportunity'},
+  {id:9,name:'Navin Foods & Catering',cat:'Restaurant',loc:'Ahmedabad',src:'Facebook',rating:3.1,reviews:22,intent:82,score:86,priority:'HOT',status:'New',website:false,phone:'','reason':'Facebook group post: needs more customers'},
+  {id:10,name:'EduBright Academy',cat:'Education',loc:'Pune',src:'Facebook',rating:4.2,reviews:180,intent:70,score:68,priority:'WARM',status:'New',website:true,phone:'9300000006',reason:'Hiring marketing manager, growth signal'},
+];
+
+const INTENTS = [
+  {prob:'Clinic owner needs more patients urgently — no online presence at all',cat:'Healthcare',score:91,urgency:'High',src:'Reddit',kw:['no website','patients','clinic']},
+  {prob:'Restaurant struggling on weekdays, digital marketing help needed',cat:'Restaurant',score:84,urgency:'High',src:'Facebook',kw:['marketing','customers','weekdays']},
+  {prob:'B2B SaaS struggling to get first 100 customers — desperate for leads',cat:'SaaS/Tech',score:88,urgency:'High',src:'Reddit',kw:['leads','B2B','customers']},
+  {prob:'Solo law firm looking for consistent lead pipeline, tried ads',cat:'Legal',score:72,urgency:'Medium',src:'Reddit',kw:['leads','legal','ads']},
+  {prob:'Salon owner needs appointment automation — managing via WhatsApp chaos',cat:'Wellness',score:65,urgency:'Medium',src:'Facebook',kw:['automation','salon','booking']},
+  {prob:'Jewelry e-commerce: Facebook ads giving 0 ROI, wasting ₹50k/month',cat:'E-commerce',score:79,urgency:'High',src:'Facebook',kw:['ads','ROI','jewelry']},
+];
+
+const EXPORTS = [
+  {name:'leads_export_may2025.csv',size:'2.1 MB',date:'2h ago',type:'CSV',status:'Ready'},
+  {name:'report_april2025.pdf',size:'4.7 MB',date:'2 days ago',type:'PDF',status:'Ready'},
+  {name:'intent_data_q1.csv',size:'890 KB',date:'5 days ago',type:'CSV',status:'Ready'},
+  {name:'full_backup_march.zip',size:'12.4 MB',date:'1 month ago',type:'ZIP',status:'Ready'},
+];
+
+const FILES = [
+  {name:'leads_export_may2025.csv',size:'2.1 MB',type:'csv',date:'May 3, 2025',url:'#'},
+  {name:'report_april2025.pdf',size:'4.7 MB',type:'pdf',date:'Apr 28, 2025',url:'#'},
+  {name:'intent_data_q1.csv',size:'890 KB',type:'csv',date:'Apr 15, 2025',url:'#'},
+  {name:'full_backup_march.zip',size:'12.4 MB',type:'zip',date:'Mar 31, 2025',url:'#'},
+  {name:'hot_leads_march.csv',size:'1.2 MB',type:'csv',date:'Mar 15, 2025',url:'#'},
+];
+
+const EMAIL_TEMPLATES = [
+  {name:'Clinic Cold Email',icon:'🏥',desc:'For healthcare/dental clinics with no website'},
+  {name:'Restaurant Outreach',icon:'🍽',desc:'For restaurants with low digital presence'},
+  {name:'B2B Lead Gen',icon:'💼',desc:'For startups needing lead generation'},
+  {name:'Legal Services',icon:'⚖',desc:'For law firms and legal practitioners'},
+  {name:'Fitness Studio',icon:'💪',desc:'For gyms and fitness centers'},
+  {name:'E-commerce',icon:'🛒',desc:'For online stores with poor conversion'},
+];
+
+const SENT_EMAILS = [
+  {to:'info@alphaclinic.com',sub:'Quick idea for Alpha Clinic',status:'Opened',date:'May 3, 12:30 PM'},
+  {to:'contact@citygym.in',sub:'More members for City Gym',status:'Sent',date:'May 2, 4:15 PM'},
+  {to:'hello@navinfoods.com',sub:'Get more customers this week',status:'Bounced',date:'May 1, 10:00 AM'},
+];
+
+const NOTIF_PREFS = [
+  {name:'New HOT Lead',desc:'Alert when a HOT lead is detected'},
+  {name:'Collection Complete',desc:'Notify when data collection finishes'},
+  {name:'Payment Receipts',desc:'Email invoice after each payment'},
+  {name:'Weekly Report',desc:'Summary email every Monday'},
+  {name:'Intent Spikes',desc:'Alert for high-urgency intent signals'},
+];
+
+const ADMIN_USERS = [
+  {email:'rahul@digitalagency.in',plan:'pro',leads:248,joined:'Mar 2025'},
+  {email:'priya@startup.com',plan:'basic',leads:82,joined:'Feb 2025'},
+  {email:'anit@clinic.in',plan:'pro',leads:194,joined:'Jan 2025'},
+  {email:'dev@freelancer.io',plan:'free',leads:12,joined:'Apr 2025'},
+  {email:'admin@consultancy.com',plan:'pro',leads:310,joined:'Dec 2024'},
+];
+
+const ADMIN_PAYMENTS = [
+  {user:'rahul@digitalagency.in',plan:'Pro',amount:'₹999',date:'May 3, 2025',status:'Paid'},
+  {user:'anit@clinic.in',plan:'Pro',amount:'₹999',date:'May 1, 2025',status:'Paid'},
+  {user:'priya@startup.com',plan:'Basic',amount:'₹499',date:'Apr 28, 2025',status:'Paid'},
+  {user:'admin@consultancy.com',plan:'Pro',amount:'₹999',date:'Apr 25, 2025',status:'Paid'},
+];
+
+const AI_INSIGHTS = [
+  {icon:'🔥',text:'Healthcare in Mumbai has 40% more HOT leads this week',color:'var(--hot)',badge:'Trending'},
+  {icon:'📈',text:'Reddit intent for "lead generation" spiked 3× — great time to prospect B2B',color:'var(--violet)',badge:'Opportunity'},
+  {icon:'🎯',text:'Businesses with rating < 3.5 convert 2× better — 34 such leads waiting',color:'var(--amber)',badge:'Action'},
+  {icon:'⚡',text:'No-website businesses in Bangalore: 18 HOT leads identified',color:'var(--blue)',badge:'Quick Win'},
+];
+
+let filteredLeads = [...LEADS];
+let sidebarCollapsed = false;
+let chartInstances = {};
+
+// ═══════════════════════════════════════════════════════
+// CORE NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const p = document.getElementById('page-' + name);
+  if (p) p.classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const map = {dashboard:0,collect:1,leads:2,intent:3,messenger:4,export:5,email:6,files:7,billing:8,admin:9,settings:10};
+  if (map[name] !== undefined) items[map[name]]?.classList.add('active');
+  initPage(name);
+}
+
+function initPage(name) {
+  const inits = {
+    dashboard: initDashboard,
+    leads: initLeads,
+    intent: initIntent,
+    export: initExport,
+    email: initEmail,
+    files: initFiles,
+    admin: initAdmin,
+    settings: initSettings,
+    collect: initCollect,
+  };
+  if (inits[name]) inits[name]();
+}
+
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+  document.querySelector('.collapse-btn').textContent = sidebarCollapsed ? '▶' : '◀';
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════
+function doLogin() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'flex';
+  initDashboard();
+  showToast('Welcome back, Rahul! 👋', 'success');
+}
+function showSignup() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'block';
+}
+function showLogin() {
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('signup-form').style.display = 'none';
+}
+function selectPlan(el, plan) {
+  el.parentElement.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD INIT
+// ═══════════════════════════════════════════════════════
+function initDashboard() {
+  // Growth Chart
+  renderChart('growthChart', 'line', {
+    labels: ['Apr 3','Apr 7','Apr 11','Apr 15','Apr 19','Apr 23','Apr 27','May 1','May 3'],
+    datasets: [{
+      label:'Leads',data:[120,180,210,195,280,320,365,420,481],
+      borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',
+      tension:.4,fill:true,pointRadius:4,pointBackgroundColor:'#3b82f6',borderWidth:2
+    },{
+      label:'HOT Leads',data:[28,42,55,48,76,98,112,145,168],
+      borderColor:'#ff4757',backgroundColor:'rgba(255,71,87,.06)',
+      tension:.4,fill:true,pointRadius:4,pointBackgroundColor:'#ff4757',borderWidth:2
+    }]
+  });
+
+  // Priority Pie
+  renderChart('priorityChart','doughnut',{
+    labels:['HOT 🔥','WARM ♨','COLD ❄'],
+    datasets:[{data:[347,892,1242],backgroundColor:['#ff4757','#ffa502','#3b82f6'],borderWidth:0,hoverOffset:6}]
+  },{plugins:{legend:{position:'bottom',labels:{color:'#8899cc',padding:12,font:{size:11}}}}});
+
+  // Industry bars
+  const industries = [{l:'Healthcare',v:82,c:'var(--blue)'},{l:'Restaurant',v:67,c:'var(--hot)'},{l:'Legal',v:54,c:'var(--violet)'},{l:'Fitness',v:41,c:'var(--green)'},{l:'IT Services',v:38,c:'var(--cyan)'},{l:'Education',v:29,c:'var(--amber)'}];
+  document.getElementById('industry-bars').innerHTML = industries.map(i => `
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12px">
+      <div style="width:80px;color:var(--t3)">${i.l}</div>
+      <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px"><div style="width:${i.v}%;height:100%;border-radius:3px;background:${i.c}"></div></div>
+      <div style="width:24px;color:var(--t2);text-align:right;font-family:var(--mono)">${i.v}</div>
+    </div>`).join('');
+
+  // AI Insights
+  document.getElementById('ai-insights').innerHTML = AI_INSIGHTS.map(i => `
+    <div style="display:flex;gap:10px;padding:12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border)">
+      <div style="font-size:18px">${i.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;color:var(--t2);line-height:1.4">${i.text}</div>
+      </div>
+      <span class="badge badge-hot" style="font-size:10px;align-self:flex-start">${i.badge}</span>
+    </div>`).join('');
+
+  // Recent Leads Table
+  const thead = '<thead><tr><th>Business</th><th>Category</th><th>Source</th><th>Intent</th><th>Score</th><th>Priority</th></tr></thead>';
+  const tbody = '<tbody>' + LEADS.slice(0,6).map(l => `
+    <tr onclick="openLeadDetail(${l.id})" style="cursor:pointer">
+      <td class="cell-name">${l.name}</td>
+      <td>${l.cat}</td>
+      <td><span class="badge badge-cyan" style="font-size:10px">${l.src}</span></td>
+      <td>${scoreBar(l.intent,l.intent+'%','var(--violet)')}</td>
+      <td>${scoreBar(l.score,l.score,'color(l.score)')}</td>
+      <td><span class="badge badge-${l.priority.toLowerCase()}">${l.priority}</span></td>
+    </tr>`).join('') + '</tbody>';
+  document.getElementById('dash-leads').innerHTML = thead + tbody;
+}
+
+// ═══════════════════════════════════════════════════════
+// LEADS
+// ═══════════════════════════════════════════════════════
+function initLeads() {
+  renderLeadsTable(LEADS);
+}
+
+function renderLeadsTable(leads) {
+  const t = document.getElementById('leads-table');
+  const thead = `<thead><tr><th></th><th class="th-sort">Business ↕</th><th>Category</th><th>Loc</th><th>Rating</th><th>Reviews</th><th>Intent</th><th>Score</th><th>Priority</th><th>Website</th><th>Actions</th></tr></thead>`;
+  const tbody = '<tbody>' + leads.map(l => `
+    <tr>
+      <td><input type="checkbox" style="accent-color:var(--blue)"></td>
+      <td class="cell-name" style="cursor:pointer" onclick="openLeadDetail(${l.id})">${l.name}</td>
+      <td>${l.cat}</td>
+      <td style="font-size:12px;color:var(--t3)">${l.loc}</td>
+      <td class="cell-mono">${l.rating || '—'} ★</td>
+      <td class="cell-mono">${l.reviews || '—'}</td>
+      <td>${scoreBar(l.intent,l.intent+'%','var(--violet)')}</td>
+      <td>${scoreBar(l.score,l.score,scoreColor(l.score))}</td>
+      <td><span class="badge badge-${l.priority.toLowerCase()}">${l.priority}</span></td>
+      <td>${l.website ? '<span style="color:var(--green)">✓ Yes</span>' : '<span style="color:var(--t3)">✗ No</span>'}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-xs" onclick="openLeadDetail(${l.id})">View</button>
+          <button class="btn btn-ghost btn-xs" onclick="showPage('messenger')">✉</button>
+          <button class="btn btn-danger btn-xs">★</button>
+        </div>
+      </td>
+    </tr>`).join('') + '</tbody>';
+  t.innerHTML = thead + tbody;
+  document.getElementById('filtered-count').textContent = leads.length + ' results';
+}
+
+function filterLeads() {
+  const q = document.getElementById('lead-search').value.toLowerCase();
+  const pri = document.getElementById('lead-priority-filter').value;
+  const cat = document.getElementById('lead-cat-filter').value;
+  filteredLeads = LEADS.filter(l =>
+    (!q || l.name.toLowerCase().includes(q) || l.cat.toLowerCase().includes(q)) &&
+    (!pri || l.priority === pri) &&
+    (!cat || l.cat.toLowerCase().includes(cat.toLowerCase()))
+  );
+  renderLeadsTable(filteredLeads);
+}
+
+function openLeadDetail(id) {
+  const l = LEADS.find(x => x.id === id);
+  if (!l) return;
+  const sc = scoreColor(l.score);
+  document.getElementById('panel-content').innerHTML = `
+    <div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:22px">🏢</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;letter-spacing:-.4px">${l.name}</div>
+          <div style="font-size:13px;color:var(--t3)">${l.cat} · ${l.loc}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+        <span class="badge badge-${l.priority.toLowerCase()}">${l.priority}</span>
+        <span class="badge badge-cyan">${l.src}</span>
+        ${l.website ? '<span class="badge badge-green">Has Website</span>' : '<span class="badge badge-red">No Website</span>'}
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:${sc}">${l.score}</div>
+        <div style="font-size:11px;color:var(--t3)">Lead Score</div>
+      </div>
+      <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--violet)">${l.intent}</div>
+        <div style="font-size:11px;color:var(--t3)">Intent Score</div>
+      </div>
+      <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+        <div style="font-size:20px;font-weight:800;font-family:var(--mono)">${l.rating || '—'} ★</div>
+        <div style="font-size:11px;color:var(--t3)">Rating</div>
+      </div>
+      <div style="padding:14px;background:var(--bg2);border-radius:var(--r);text-align:center">
+        <div style="font-size:20px;font-weight:800;font-family:var(--mono)">${l.reviews || '—'}</div>
+        <div style="font-size:11px;color:var(--t3)">Reviews</div>
+      </div>
+    </div>
+
+    <div style="padding:14px;background:var(--bg2);border-radius:var(--r);margin-bottom:16px">
+      <div style="font-size:11px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px">AI Analysis</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.5">${l.reason}</div>
+    </div>
+
+    ${l.phone ? `<div style="padding:12px 14px;background:var(--bg2);border-radius:var(--r);margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">📞</span><span style="font-size:13px">+91 ${l.phone}</span></div>` : ''}
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showPage('messenger')">✉ Generate Outreach Message</button>
+      <button class="btn btn-outline-blue" style="width:100%;justify-content:center" onclick="showToast('Lead favorited!','success')">★ Save to Favorites</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showToast('Copied!','success')">Copy Contact Info</button>
+    </div>
+  `;
+  document.getElementById('lead-detail').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('lead-detail').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// INTENT
+// ═══════════════════════════════════════════════════════
+function initIntent() {
+  renderChart('urgencyChart','doughnut',{
+    labels:['High','Medium','Low'],
+    datasets:[{data:[32,45,23],backgroundColor:['#ff4757','#ffa502','#3b82f6'],borderWidth:0}]
+  },{plugins:{legend:{position:'bottom',labels:{color:'#8899cc',padding:12,font:{size:11}}}}});
+
+  const cats = [{l:'Healthcare',v:28},{l:'Restaurant',v:22},{l:'SaaS',v:18},{l:'Legal',v:14},{l:'E-commerce',v:11}];
+  document.getElementById('intent-category-bars').innerHTML = cats.map(c => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px">
+      <div style="width:80px;color:var(--t3)">${c.l}</div>
+      <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:${c.v*3.5}%;height:100%;border-radius:3px;background:var(--violet)"></div></div>
+      <div style="color:var(--t2);font-family:var(--mono)">${c.v}</div>
+    </div>`).join('');
+
+  document.getElementById('intent-cards-grid').innerHTML = INTENTS.map(i => {
+    const sc = i.score >= 70 ? 'var(--hot)' : i.score >= 50 ? 'var(--warm)' : 'var(--cold)';
+    const ub = i.urgency === 'High' ? 'badge-hot' : i.urgency === 'Medium' ? 'badge-warm' : 'badge-cold';
+    return `
+      <div class="intent-card" onclick="showPage('messenger')">
+        <div class="intent-header">
+          <div class="intent-problem">${i.prob}</div>
+          <div class="intent-score-ring" style="background:${sc}18;color:${sc};border:1px solid ${sc}30;margin-left:10px">${i.score}</div>
+        </div>
+        <div class="intent-tags">
+          <span class="badge badge-free" style="font-size:10px">${i.src}</span>
+          <span class="badge ${ub}" style="font-size:10px">${i.urgency}</span>
+          <span class="badge badge-basic" style="font-size:10px">${i.cat}</span>
+        </div>
+        ${i.kw.map(k => `<span style="display:inline-block;margin-top:6px;margin-right:4px;padding:2px 8px;background:var(--bg3);border-radius:20px;font-size:10px;color:var(--t3)">${k}</span>`).join('')}
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// COLLECT
+// ═══════════════════════════════════════════════════════
+function initCollect() {
+  document.getElementById('recent-searches').innerHTML = [
+    {q:'Dental clinics Mumbai',n:23,hot:8,ago:'2h ago'},
+    {q:'Restaurants Delhi',n:45,hot:12,ago:'Yesterday'},
+    {q:'Law firms Hyderabad',n:18,hot:5,ago:'3 days ago'},
+  ].map(s => `
+    <div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:12px" onclick="showToast('Rerunning search...','success')">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">${s.q}</div>
+        <div style="font-size:11px;color:var(--t3)">${s.n} leads · <span style="color:var(--hot)">${s.hot} HOT</span> · ${s.ago}</div>
+      </div>
+      <button class="btn btn-ghost btn-xs">↻ Rerun</button>
+    </div>`).join('');
+}
+
+function startCollection() {
+  const kw = document.getElementById('c-keyword').value || 'businesses';
+  const loc = document.getElementById('c-location').value || 'India';
+  const status = document.getElementById('collect-status');
+  status.style.display = 'block';
+
+  const steps = [
+    {label:'Connecting to Google Maps API',sub:'SerpAPI integration',count:null},
+    {label:'Scanning listings',sub:'Extracting business data',count:'collecting...'},
+    {label:'Running AI lead scoring',sub:'OpenAI intent analysis',count:null},
+    {label:'Fusing with Reddit intent',sub:'Matching patterns',count:null},
+    {label:'Saving to database',sub:'Persisting results',count:null},
+  ];
+
+  let progress = 0;
+  let step = 0;
+
+  const render = () => {
+    document.getElementById('collect-steps').innerHTML = steps.map((s,i) => {
+      const cls = i < step ? 'done' : i === step ? 'active' : 'pending';
+      const icon = i < step ? '✓' : i === step ? '◌' : '○';
+      return `
+        <div class="p-step">
+          <div class="step-dot ${cls}">${icon}</div>
+          <div>
+            <div class="step-text">${s.label}</div>
+            <div class="step-sub">${s.sub}</div>
+          </div>
+          ${i < step ? '<span class="step-count">Done</span>' : ''}
+          ${i === step && s.count ? `<span class="step-count">${s.count}</span>` : ''}
+        </div>`;
+    }).join('');
+  };
+
+  const interval = setInterval(() => {
+    progress = Math.min(100, progress + Math.random() * 22 + 5);
+    document.getElementById('collect-progress-bar').style.width = progress + '%';
+    if (progress > (step + 1) * 20) step = Math.min(step + 1, steps.length - 1);
+    render();
+
+    const n = Math.floor(progress * 0.2);
+    const hot = Math.floor(n * 0.35);
+    document.getElementById('stat-collected').textContent = n;
+    document.getElementById('stat-hot').textContent = hot;
+    document.getElementById('stat-intent').textContent = Math.floor(n * 0.6);
+    document.getElementById('stat-avg').textContent = (68 + Math.random() * 15).toFixed(0);
+
+    if (progress >= 100) {
+      clearInterval(interval);
+      step = steps.length;
+      render();
+      showToast(`Collection complete! ${n} leads found (${hot} HOT) 🔥`, 'success');
+    }
+  }, 600);
+}
+
+// ═══════════════════════════════════════════════════════
+// MESSENGER
+// ═══════════════════════════════════════════════════════
+function generateMsg(type) {
+  const biz = document.getElementById('msg-biz').value || 'Alpha Clinic';
+  const cat = document.getElementById('msg-cat').value;
+  const loc = document.getElementById('msg-loc').value || 'India';
+  const intent = document.getElementById('msg-intent').value || 'needs more customers';
+
+  const out = document.getElementById('msg-output');
+  const labels = {email:'✉ Email Message', linkedin:'💼 LinkedIn DM', whatsapp:'💬 WhatsApp Pitch'};
+  document.getElementById('msg-type-label').textContent = labels[type];
+
+  out.classList.add('loading');
+  out.textContent = '';
+
+  const templates = {
+    email: `Subject: Quick idea for ${biz} — more ${cat === 'Healthcare / Clinic' ? 'patients' : 'customers'} this month
+
+Hi ${biz} team,
+
+I came across your business and noticed you might be ${intent}. 
+
+We've helped 50+ ${cat} businesses in ${loc} build a consistent flow of new enquiries — without spending a fortune on ads.
+
+What's worked for similar businesses:
+→ Google My Business optimization (+40% calls)
+→ Targeted local SEO strategy
+→ AI-powered lead nurturing
+
+I'd love to share a quick 15-min demo of what's possible specifically for your business.
+
+Would Thursday or Friday work for a quick call?
+
+Best,
+[Your Name]`,
+    linkedin: `Hi there 👋
+
+Noticed ${biz} and impressed by your work in ${cat}!
+
+Saw you might be facing: "${intent}" — we've solved exactly this for 30+ similar businesses.
+
+Our AI-powered system delivers qualified leads every week, on autopilot.
+
+Happy to share results? → [calendly.com/yourlink]`,
+    whatsapp: `Hi! 👋 I help ${cat} businesses in ${loc} get more customers.
+
+Noticed ${biz} could benefit from our AI lead system.
+
+✅ 50+ clients served
+✅ Results in 30 days
+✅ No long contracts
+
+Can I send you a quick video showing how it works? 🙏`,
+  };
+
+  let i = 0;
+  const text = templates[type];
+  document.getElementById('msg-subject-line').textContent = type === 'email' ? `Subject: Quick idea for ${biz}` : `${type} message ready`;
+
+  const typeInterval = setInterval(() => {
+    out.textContent = text.slice(0, i);
+    i += 4;
+    if (i >= text.length) {
+      out.textContent = text;
+      out.classList.remove('loading');
+      clearInterval(typeInterval);
+    }
+  }, 20);
+}
+
+function copyMsg() {
+  navigator.clipboard?.writeText(document.getElementById('msg-output').textContent);
+  showToast('Message copied to clipboard!', 'success');
+}
+
+function selectTone(el, tone) {
+  el.parentElement.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════
+function initExport() {
+  document.getElementById('export-history').innerHTML = EXPORTS.map(e => `
+    <div class="file-card">
+      <div class="file-icon" style="background:${e.type==='PDF'?'rgba(139,92,246,.1)':e.type==='ZIP'?'rgba(245,158,11,.1)':'rgba(59,130,246,.1)'}">${e.type==='PDF'?'📋':e.type==='ZIP'?'🗜':' 📊'}</div>
+      <div>
+        <div class="file-name">${e.name}</div>
+        <div class="file-meta">${e.size} · ${e.date}</div>
+      </div>
+      <div class="file-actions">
+        <span class="badge badge-green">${e.status}</span>
+        <button class="btn btn-ghost btn-xs" onclick="showToast('Downloading...','success')">↓</button>
+      </div>
+    </div>`).join('');
+}
+
+function doExport(type) {
+  showToast(`Preparing ${type.toUpperCase()} export...`, 'success');
+  setTimeout(() => showToast('Export ready! Check File Storage.', 'success'), 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// EMAIL
+// ═══════════════════════════════════════════════════════
+function initEmail() {
+  document.getElementById('email-templates-grid').innerHTML = EMAIL_TEMPLATES.map(t => `
+    <div class="email-template" onclick="showPage('messenger')">
+      <div class="et-preview">${t.icon}</div>
+      <div class="et-body">
+        <div class="et-name">${t.name}</div>
+        <div class="et-desc">${t.desc}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('sent-emails-table').innerHTML = SENT_EMAILS.map(e => `
+    <tr>
+      <td class="cell-name">${e.to}</td>
+      <td>${e.sub}</td>
+      <td><span class="badge ${e.status==='Opened'?'badge-green':e.status==='Bounced'?'badge-red':'badge-free'}">${e.status}</span></td>
+      <td style="color:var(--t3);font-size:12px">${e.date}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="showPage('messenger')">View</button></td>
+    </tr>`).join('');
+}
+
+function setTab(btn, id) {
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const parent = btn.closest('.page');
+  parent.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════
+// FILES
+// ═══════════════════════════════════════════════════════
+function initFiles() {
+  document.getElementById('files-list').innerHTML = FILES.map(f => {
+    const ic = {csv:'📊',pdf:'📋',zip:'🗜'}[f.type] || '📄';
+    const bg = {csv:'rgba(59,130,246,.1)',pdf:'rgba(139,92,246,.1)',zip:'rgba(245,158,11,.1)'}[f.type] || 'rgba(255,255,255,.05)';
+    return `
+      <div class="file-card">
+        <div class="file-icon" style="background:${bg}">${ic}</div>
+        <div>
+          <div class="file-name">${f.name}</div>
+          <div class="file-meta">${f.size} · ${f.date} · Cloudinary CDN</div>
+        </div>
+        <div class="file-actions">
+          <button class="btn btn-outline-blue btn-xs" onclick="showToast('Link copied!','success')">Share</button>
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Downloading...','success')">↓</button>
+          <button class="btn btn-danger btn-xs" onclick="this.closest('.file-card').remove();showToast('File deleted','success')">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════════
+function initAdmin() {
+  renderChart('adminRevChart','bar',{
+    labels:['Dec','Jan','Feb','Mar','Apr','May'],
+    datasets:[{label:'Revenue (₹)',data:[82000,98000,115000,142000,168000,185000],backgroundColor:'rgba(59,130,246,.7)',borderRadius:6}]
+  });
+
+  renderChart('adminPlanChart','doughnut',{
+    labels:['Pro','Basic','Free'],
+    datasets:[{data:[412,618,812],backgroundColor:['#8b5cf6','#3b82f6','#1c2540'],borderWidth:0}]
+  },{plugins:{legend:{position:'bottom',labels:{color:'#8899cc',padding:12,font:{size:11}}}}});
+
+  document.getElementById('admin-users-table').innerHTML = `
+    <thead><tr><th>Email</th><th>Plan</th><th>Leads</th><th>Joined</th><th>Actions</th></tr></thead>
+    <tbody>` + ADMIN_USERS.map(u => `
+    <tr>
+      <td class="cell-name">${u.email}</td>
+      <td><span class="badge badge-${u.plan}">${u.plan.toUpperCase()}</span></td>
+      <td class="cell-mono">${u.leads}</td>
+      <td style="color:var(--t3);font-size:12px">${u.joined}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-xs" onclick="showToast('Plan changed!','success')">Change Plan</button>
+          <button class="btn btn-danger btn-xs" onclick="showToast('User deleted!','success')">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('') + '</tbody>';
+
+  document.getElementById('admin-payments-table').innerHTML = `
+    <thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+    <tbody>` + ADMIN_PAYMENTS.map(p => `
+    <tr>
+      <td style="color:var(--t1);font-size:13px">${p.user}</td>
+      <td><span class="badge badge-${p.plan.toLowerCase()}">${p.plan}</span></td>
+      <td class="cell-mono" style="color:var(--green)">${p.amount}</td>
+      <td style="color:var(--t3);font-size:12px">${p.date}</td>
+      <td><span class="badge badge-green">${p.status}</span></td>
+    </tr>`).join('') + '</tbody>';
+}
+
+function setAdminTab(btn, id) {
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['admin-users-tab','admin-payments-tab','admin-api-tab'].forEach(t => {
+    document.getElementById(t).style.display = t === id ? 'block' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function initSettings() {
+  document.getElementById('notif-settings').innerHTML = NOTIF_PREFS.map((n,i) => `
+    <div class="toggle-row" style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:600">${n.name}</div>
+        <div style="font-size:12px;color:var(--t3)">${n.desc}</div>
+      </div>
+      <div style="width:40px;height:22px;border-radius:11px;background:${i<3?'rgba(59,130,246,.4)':'var(--bg3)'};border:1px solid ${i<3?'rgba(59,130,246,.5)':'var(--border2)'};cursor:pointer;position:relative;transition:all .2s" onclick="toggleSwitch(this,${i<3})">
+        <div style="position:absolute;top:2px;${i<3?'right:2px':'left:2px'};width:16px;height:16px;border-radius:50%;background:${i<3?'var(--blue)':'var(--t3)'};transition:all .2s"></div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleSwitch(el, current) {
+  const isOn = !current;
+  el.style.background = isOn ? 'rgba(59,130,246,.4)' : 'var(--bg3)';
+  el.style.borderColor = isOn ? 'rgba(59,130,246,.5)' : 'var(--border2)';
+  const knob = el.querySelector('div');
+  knob.style[isOn ? 'right' : 'left'] = '2px';
+  knob.style[isOn ? 'left' : 'right'] = 'auto';
+  knob.style.background = isOn ? 'var(--blue)' : 'var(--t3)';
+}
+
+// ═══════════════════════════════════════════════════════
+// PAYMENT
+// ═══════════════════════════════════════════════════════
+function initiatePayment(plan) {
+  document.getElementById('payment-plan-desc').textContent = `Upgrading to ${plan.charAt(0).toUpperCase()+plan.slice(1)} Plan via Razorpay`;
+  document.getElementById('payment-amount').textContent = plan === 'basic' ? '₹499' : '₹999';
+  document.getElementById('payment-modal').classList.add('show');
+}
+
+function processPayment() {
+  closeModal('payment-modal');
+  showToast('Processing payment via Razorpay...', 'success');
+  setTimeout(() => showToast('Payment successful! Plan activated. ✦', 'success'), 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// CHARTS HELPER
+// ═══════════════════════════════════════════════════════
+function renderChart(id, type, data, extraOpts = {}) {
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch(e){} }
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const baseOpts = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: type === 'doughnut', labels: { color: '#8899cc', padding: 12, font: { size: 11 } } },
+      tooltip: { backgroundColor: '#10172a', borderColor: '#2a3a60', borderWidth: 1, titleColor: '#f0f4ff', bodyColor: '#8899cc', padding: 10 }
+    },
+    scales: type !== 'doughnut' ? {
+      x: { grid: { color: 'rgba(42,58,96,.4)', drawBorder: false }, ticks: { color: '#4a5a80', font: { size: 11 } } },
+      y: { grid: { color: 'rgba(42,58,96,.4)', drawBorder: false }, ticks: { color: '#4a5a80', font: { size: 11 } } }
+    } : {},
+  };
+  chartInstances[id] = new Chart(canvas, {
+    type, data,
+    options: mergeDeep(baseOpts, extraOpts)
+  });
+}
+
+function mergeDeep(a, b) {
+  const out = { ...a };
+  for (const k in b) {
+    out[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]))
+      ? mergeDeep(a[k] || {}, b[k]) : b[k];
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function scoreBar(val, label, color) {
+  const c = typeof color === 'string' && color.startsWith('color(') ? scoreColor(val) : color;
+  return `<div class="score-bar-wrap"><div class="score-track"><div class="score-fill" style="width:${val}%;background:${c}"></div></div><span class="cell-mono">${label}</span></div>`;
+}
+
+function scoreColor(s) {
+  if (s >= 70) return 'var(--hot)';
+  if (s >= 40) return 'var(--warm)';
+  return 'var(--cold)';
+}
+
+function showToast(msg, type = 'success') {
+  const wrap = document.getElementById('toasts');
+  const d = document.createElement('div');
+  d.className = `toast ${type}`;
+  d.innerHTML = `<span class="toast-icon">${type === 'success' ? '✓' : '✕'}</span> ${msg}`;
+  wrap.appendChild(d);
+  setTimeout(() => { d.style.animation = 'toastIn .3s ease reverse'; setTimeout(() => d.remove(), 300); }, 3500);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// Init
+initDashboard();
+</script>
+</body>
+</html>
